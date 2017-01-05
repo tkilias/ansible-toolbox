@@ -14,26 +14,11 @@ set -u # abort on unbound variable
 
 usage() {
 cat << _EOF_
-Usage: ${0} PROJECT_NAME [ROLE]...
+Usage: ${0} PROJECT_NAME
   Initialises a Vagrant+Ansible project based on
-  https://github.com/bertvv/ansible-skeleton
-  and optionally, installs the specified roles from Ansible Galaxy
+  https://github.com/tkilias/ansible-skeleton
+  and optionally
 _EOF_
-}
-
-install_role() {
-  # First, try to install from Ansible Galaxy directly
-  ansible-galaxy install -p ansible/roles "${1}"
-
-  if [ "$?" -ne "0" ]; then
-    echo " ## This role does not seem to be on Ansible Galaxy. Trying Github"
-    user=${1%%\.*}
-    role=${1##*\.}
-    rolename=${role##ansible-}
-    git_url="https://github.com/${user}/${role}.git"
-    echo " ## => ${git_url}"
-    git clone "${git_url}" "ansible/roles/${user}.${rolename}"
-  fi
 }
 
 #}}}
@@ -62,18 +47,10 @@ shift
 #}}}
 # Script proper
 
-wget https://github.com/bertvv/ansible-skeleton/archive/master.zip
+wget https://github.com/tkilias/ansible-skeleton/archive/master.zip
 unzip master.zip
 rm master.zip
 
 mv ansible-skeleton-master "${project}"
-git init "${project}"
 cd "${project}"
-git add .
-git commit --message "Initial commit, Ansible skeleton"
 mkdir ansible/host_vars/
-
-for role in "${@}"; do
-  install_role "${role}"
-done
-
